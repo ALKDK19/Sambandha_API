@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     SMTP_USERNAME: Optional[EmailStr] = None
     SMTP_PASSWORD: Optional[str] = None
     EMAIL_FROM: Optional[EmailStr] = None
+    EMAIL_FROM_NAME: str = "Sambandha Team"
 
     GOOGLE_APPLICATION_CREDENTIALS: str = ""
 

@@ -60,7 +60,7 @@ cd sambandha-backend
 ### 2. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.min.txt
 ```
 
 ### 3. Configure environment variables
@@ -76,7 +76,7 @@ Or edit `.env` directly. See [Environment Variables](#environment-variables) bel
 ### 4. Run the server
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 The API will be available at `http://127.0.0.1:8000`.
@@ -84,7 +84,7 @@ The API will be available at `http://127.0.0.1:8000`.
 For network access, you can also run:
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 ## Environment Variables

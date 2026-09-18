@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+pydantic[email]
+pydantic_settings
+alembic
+python-dotenv
+sqlalchemy
+psycopg2
+python-dateutil
+cloudinary
+sentence_transformers
+scikit-learn
+numpy
+firebase_admin
+passlib
+python-jose[cryptography]
+python-multipart
