@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -12,12 +12,6 @@ from app.database import get_db
 from app.models.admin import Admin
 from app.models.user import User
 from app.schemas.user import TokenData
-
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# OTP hashing context (using Argon2 for speed and security)
-otp_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # OAuth2 schemes
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
@@ -31,23 +25,30 @@ admin_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/admin/login")
 # --------------------------
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    plain_bytes = plain_password.encode("utf-8")[:72]
+    hashed_bytes = hashed_password.encode("utf-8")
+    return bcrypt.checkpw(plain_bytes, hashed_bytes)
 
 
 def get_password_hash(password: str) -> str:
     # Truncate password to 72 bytes for bcrypt
-    password = password[:72]
-    return pwd_context.hash(password)
+    password_bytes = password.encode("utf-8")[:72]
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password_bytes, salt).decode("utf-8")
 
 
-# OTP hash and verify functions
+# OTP hash and verify functions using bcrypt
 
 def get_otp_hash(otp: str) -> str:
-    return otp_context.hash(otp)
+    otp_bytes = otp.encode("utf-8")[:72]
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(otp_bytes, salt).decode("utf-8")
 
 
 def verify_otp(plain_otp: str, hashed_otp: str) -> bool:
-    return otp_context.verify(plain_otp, hashed_otp)
+    plain_bytes = plain_otp.encode("utf-8")[:72]
+    hashed_bytes = hashed_otp.encode("utf-8")
+    return bcrypt.checkpw(plain_bytes, hashed_bytes)
 
 
 # --------------------------
@@ -136,6 +137,7 @@ def active_user_ids_query(db: Session):
     # Return an explicit subquery so callers can safely use `.in_(...)` with it.
     return db.query(User.user_id).filter(User.is_active == True).subquery()
 
+
 def ensure_active_user_or_404(user: User):
     """Raise a 404 if the user is None or inactive. Returns the user when active."""
     if user is None or not getattr(user, 'is_active', True):
@@ -196,13 +198,11 @@ async def get_current_active_admin(
 # --------------------------
 
 def verify_admin_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return verify_password(plain_password, hashed_password)
 
 
 def get_admin_password_hash(password: str) -> str:
-    # Truncate password to 72 bytes for bcrypt
-    password = password[:72]
-    return pwd_context.hash(password)
+    return get_password_hash(password)
 
 
 async def get_current_superuser(

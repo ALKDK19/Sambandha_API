@@ -40,6 +40,8 @@ class UserCreate(UserBase):
         # Example: at least 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters long.")
+        if len(v) > 72:
+            raise ValueError("Password cannot be longer than 72 characters.")
         if not re.search(r"[A-Z]", v):
             raise ValueError("Password must contain at least one uppercase letter.")
         if not re.search(r"[a-z]", v):
@@ -109,6 +111,8 @@ class ResetPasswordWithOtpRequest(BaseModel):
         # Example: at least 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters long.")
+        if len(v) > 72:
+            raise ValueError("Password cannot be longer than 72 characters.")
         if not re.search(r"[A-Z]", v):
             raise ValueError("Password must contain at least one uppercase letter.")
         if not re.search(r"[a-z]", v):
@@ -129,6 +133,8 @@ class ChangePasswordRequest(BaseModel):
         # Re-using the same strong password validation
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters long.")
+        if len(v) > 72:
+            raise ValueError("Password cannot be longer than 72 characters.")
         if not any(c.isupper() for c in v):
             raise ValueError("Password must contain at least one uppercase letter.")
         if not any(c.islower() for c in v):

@@ -12,6 +12,6 @@ sentence_transformers
 scikit-learn
 numpy
 firebase_admin
-passlib
+bcrypt>=4.1,<5
 python-jose[cryptography]
 python-multipart
